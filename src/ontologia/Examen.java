@@ -7,7 +7,7 @@ public class Examen implements Concept
     private String asignatura;
     private int creditos;
     private int dificultad;
-    private int horasEstudio;
+    private int diasAntesExamen;
 
     public Examen()
     {
@@ -43,13 +43,13 @@ public class Examen implements Concept
         this.dificultad = dificultad;
     }
 
-    public int getHorasEstudio()
+    public int getDiasAntesExamen()
     {
-        return horasEstudio;
+        return diasAntesExamen;
     }
 
-    public void setHorasEstudio(int horasEstudio)
+    public void setDiasAntesExamen(int diasAntesExamen)
     {
-        this.horasEstudio = horasEstudio;
+        this.diasAntesExamen = diasAntesExamen;
     }
 }

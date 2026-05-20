@@ -29,14 +29,22 @@ public class EnviarExamenBehaviour extends OneShotBehaviour
     @Override
     public void action()
     {
-        Examen examen = pedirDatosExamen();
-        enviarExamen(examen);
-    }
-
-    private Examen pedirDatosExamen()
-    {
         Scanner scanner = new Scanner(System.in);
 
+        System.out.print("Cuantos examenes quieres introducir: ");
+        int totalExamenes = Integer.parseInt(scanner.nextLine());
+
+        for (int i = 1; i <= totalExamenes; i++)
+        {
+            System.out.println("Introduce los datos del examen " + i + ":");
+
+            Examen examen = pedirDatosExamen(scanner);
+            enviarExamen(examen);
+        }
+    }
+
+    private Examen pedirDatosExamen(Scanner scanner)
+    {
         Examen examen = new Examen();
 
         System.out.print("Asignatura: ");
@@ -48,8 +56,8 @@ public class EnviarExamenBehaviour extends OneShotBehaviour
         System.out.print("Dificultad(1-10): ");
         examen.setDificultad(Integer.parseInt(scanner.nextLine()));
 
-        System.out.print("Horas de estudio: ");
-        examen.setHorasEstudio(Integer.parseInt(scanner.nextLine()));
+        System.out.print("Dias que quedan antes del examen: ");
+        examen.setDiasAntesExamen(Integer.parseInt(scanner.nextLine()));
 
         return examen;
     }
