@@ -21,6 +21,8 @@ public class OntologiaExamenes extends BeanOntology implements Vocabulario
         try
         {
             add(Examen.class);
+
+            add(SolicitarPlanificacion.class);
         }
         catch (BeanOntologyException e)
         {

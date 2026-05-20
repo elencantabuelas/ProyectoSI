@@ -9,4 +9,6 @@ public interface Vocabulario
     String EXAMEN_CREDITOS = "creditos";
     String EXAMEN_DIFICULTAD = "dificultad";
     String EXAMEN_HORAS_ESTUDIO = "horasEstudio";
+    String SOLICITAR_PLANIFICACION = "SolicitarPlanificacion";
+    String SOLICITAR_PLANIFICACION_EXAMEN = "examen";
 }
