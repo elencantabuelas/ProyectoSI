@@ -36,7 +36,7 @@ public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
                 int dificultad = Integer.parseInt(partes[1].trim());
                 int horas = calcularHoras(creditos, dificultad);
 
-                System.out.println("AgenteEsfuerzo: [" + asignatura + "]" + " créditos=" + creditos + " dificultad=" + dificultad + " → horas estimadas=" + horas);
+                System.out.println("Asignatura=" + asignatura + " créditos=" + creditos + " dificultad=" + dificultad + " → horas estimadas=" + horas);
 
                 // Responder al Coordinador con INFORM
                 ACLMessage respuesta = mensaje.createReply();
@@ -46,10 +46,10 @@ public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
 
                 myAgent.send(respuesta);
 
-                System.out.println("AgenteEsfuerzo: INFORM enviado al Coordinador" + " [convId=" + convId + ", horas=" + horas + "]");
+                System.out.println("INFORM enviado al Coordinador" + " [convId=" + convId + ", horas=" + horas + "]");
 
             } catch (Exception e) {
-                System.err.println("AgenteEsfuerzo: error al procesar mensaje -> " + e.getMessage());
+                System.err.println("Error al procesar mensaje -> " + e.getMessage());
                 e.printStackTrace();
             }
 
