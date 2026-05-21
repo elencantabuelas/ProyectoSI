@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-<<<<<<< HEAD
       <module fileurl="file://$PROJECT_DIR$/ProyectoSI.iml" filepath="$PROJECT_DIR$/ProyectoSI.iml" />
-=======
-      <module fileurl="file://$PROJECT_DIR$/practica.iml" filepath="$PROJECT_DIR$/practica.iml" />
->>>>>>> agenteControlador
     </modules>
   </component>
 </project>
