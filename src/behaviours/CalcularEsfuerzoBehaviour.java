@@ -36,7 +36,7 @@ public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
                 int dificultad = Integer.parseInt(partes[1].trim());
                 int horas = calcularHoras(creditos, dificultad);
 
-                System.out.println("AgenteEsfuerzo: [" + asignatura + "]" + " créditos =" + creditos + " dificultad =" + dificultad + " → horas estimadas =" + horas);
+                System.out.println("AgenteEsfuerzo: [" + asignatura + "]" + " créditos=" + creditos + " dificultad=" + dificultad + " → horas estimadas=" + horas);
 
                 // Responder al Coordinador con INFORM
                 ACLMessage respuesta = mensaje.createReply();
