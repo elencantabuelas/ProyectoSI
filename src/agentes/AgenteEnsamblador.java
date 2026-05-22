@@ -3,9 +3,9 @@ package agentes;
 import behaviours.ProcesarPlanBehaviour;
 import jade.core.Agent;
 import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
+
+import static utils.UtilidadesDF.registrarServicio;
 
 public class AgenteEnsamblador extends Agent {
 
@@ -13,22 +13,8 @@ public class AgenteEnsamblador extends Agent {
     protected void setup() {
         System.out.println("Agente Ensamblador (" + getLocalName() + ") iniciando...");
 
-
-        // REGISTRO EN EL DIRECTORY FACILITATOR para que el Coordinador encuentre al agente
-        DFAgentDescription dfd = new DFAgentDescription();
-        dfd.setName(getAID());
-
-        ServiceDescription sd = new ServiceDescription();
-        sd.setType("ensamblador-plan"); //tipo de servicio
-        sd.setName("JADE-planificacion-estudios");
-        dfd.addServices(sd);
-
-        try {
-            DFService.register(this, dfd);
-            System.out.println("Agente Ensamblador registrado correctamente en el DF.");
-        } catch (FIPAException fe) {
-            fe.printStackTrace();
-        }
+        // Usando nuestra clase de utilidades
+        registrarServicio(this, "ensamblador-plan", "JADE-planificacion-estudios");
 
         //COMPORTAMIENTO PRINCIPAL
         addBehaviour(new ProcesarPlanBehaviour(this));

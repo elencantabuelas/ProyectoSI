@@ -3,9 +3,9 @@ package agentes;
 import behaviours.CalcularEsfuerzoBehaviour;
 import jade.core.Agent;
 import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
+
+import static utils.UtilidadesDF.registrarServicio;
 
 public class AgenteEsfuerzo extends Agent {
 
@@ -13,7 +13,8 @@ public class AgenteEsfuerzo extends Agent {
     protected void setup() {
         System.out.println("AgenteEsfuerzo iniciado: " + getLocalName());
 
-        registrarServicioDF();
+        // Arreglado el tipo de servicio para coincidir con el del Coordinador y usando funcion de UtilidadesDF
+        registrarServicio(this, "calculo-esfuerzo", "servicio-esfuerzo");
 
         addBehaviour(new CalcularEsfuerzoBehaviour(this));
     }
@@ -26,22 +27,5 @@ public class AgenteEsfuerzo extends Agent {
             e.printStackTrace();
         }
         System.out.println("AgenteEsfuerzo: terminando.");
-    }
-
-    private void registrarServicioDF() {
-        try {
-            DFAgentDescription dfd = new DFAgentDescription();
-            dfd.setName(getAID());
-
-            ServiceDescription sd = new ServiceDescription();
-            sd.setType("servicio-esfuerzo");
-            sd.setName("servicio-esfuerzo");
-            dfd.addServices(sd);
-
-            DFService.register(this, dfd);
-        } catch (FIPAException e) {
-            System.err.println("AgenteEsfuerzo: error al registrar en el DF -> " + e.getMessage());
-            doDelete();
-        }
     }
 }

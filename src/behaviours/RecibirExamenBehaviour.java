@@ -87,7 +87,7 @@ public class RecibirExamenBehaviour extends CyclicBehaviour {
 
                         if(agenteUrgencia != null){
                             ACLMessage msgUrgencia = new ACLMessage(ACLMessage.REQUEST);
-                            msgUrgencia.addReceiver(new AID(NOMBRE_URGENCIA, AID.ISLOCALNAME));
+                            msgUrgencia.addReceiver(agenteUrgencia); // Usamos el agente encontrado en el DF
 
                             //le enviamos los dias que faltan
                             String contenido = String.valueOf(examen.getDiasAntesExamen());
