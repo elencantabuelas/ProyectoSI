@@ -13,20 +13,16 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
-        //FILTRADO DE MENSAJES
-        // el coordinador envia un REQUES
+        // Espera a recibir un mensaje con el performative REQUEST
         MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-
-        //RECEPCION
         ACLMessage msg = myAgent.receive(mt);
 
         if (msg != null) {
-
             String contenido = msg.getContent();
-            System.out.println("\n[Ensamblador] Mensaje recibido de " + msg.getSender().getLocalName());
-            System.out.println("[Ensamblador] Contenido: " + contenido);
+            System.out.println("\n[Ensamblador] Petición de plan recibida de " + msg.getSender().getLocalName());
+            System.out.println("[Ensamblador] Datos recibidos: " + contenido);
 
-            //deveria de llegar como asignatura,horas,prioridad
+            // El contenido esperado es "asignatura,horas,prioridad"
             String[] partes = contenido.split(",");
 
             if (partes.length == 3) {
@@ -34,27 +30,31 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
                 String horas = partes[1].trim();
                 String prioridad = partes[2].trim();
 
-                // me falta hacer la logica para almacenar y ordenar las asignaturas
-                
-                System.out.println("[Ensamblador] Procesando -> Asignatura: " + asignatura +
-                        " | Horas: " + horas + " | Prioridad: " + prioridad);
+                // --- Lógica de Ensamblaje del Plan ---
+                System.out.println("-------------------------------------------");
+                System.out.println("          PLAN DE ESTUDIO GENERADO         ");
+                System.out.println("-------------------------------------------");
+                System.out.println("Asignatura: " + asignatura);
+                System.out.println("-> Horas de estudio recomendadas: " + horas);
+                System.out.println("-> Nivel de prioridad: " + prioridad);
+                System.out.println("-------------------------------------------");
 
-                //RESPUESTA
-                // createReply() que copia el campo ConversationId automáticamente
+
+                // Enviar una confirmación al coordinador
                 ACLMessage reply = msg.createReply();
                 reply.setPerformative(ACLMessage.INFORM);
-                reply.setContent("Plan guardado para " + asignatura);
-
+                reply.setContent("Plan de estudio para '" + asignatura + "' generado y mostrado en consola.");
                 myAgent.send(reply);
-                System.out.println("[Ensamblador] Confirmación enviada con ID de conversación: "
-                        + reply.getConversationId());
+
             } else {
-                System.err.println("[Ensamblador] ERROR: Formato de mensaje incorrecto. " +
-                        "Se esperaba 'asignatura,horas,prioridad' y llegó: " + contenido);
+                System.err.println("[Ensamblador] ERROR: Formato de mensaje incorrecto.");
+                ACLMessage reply = msg.createReply();
+                reply.setPerformative(ACLMessage.FAILURE);
+                reply.setContent("El formato del mensaje era incorrecto. Se esperaba 'asignatura,horas,prioridad'.");
+                myAgent.send(reply);
             }
         } else {
-            //BLOQUEO
-            //si no hay mensajes, pausamos asta que llegue uno nuevo
+            // Si no hay mensajes, el comportamiento se bloquea hasta que llegue uno
             block();
         }
     }
