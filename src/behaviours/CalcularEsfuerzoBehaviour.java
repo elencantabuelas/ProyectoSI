@@ -7,8 +7,7 @@ import jade.lang.acl.MessageTemplate;
 
 public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
 
-    // Factor de horas de estudio por (crédito × punto de dificultad)
-    private static final double FACTOR = 1.5;
+    private static final int HORAS_POR_CREDITO = 10;
 
     private static final MessageTemplate MT = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 
@@ -23,7 +22,7 @@ public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
         if (mensaje != null) {
             String contenido = mensaje.getContent();
             String convId    = mensaje.getConversationId();
-            
+
             if (convId == null || !convId.startsWith("calculo-")) {
                 return;
             }
@@ -32,21 +31,20 @@ public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
 
             try {
                 String[] partes = contenido.split(",");
-                int creditos = Integer.parseInt(partes[0].trim());
+                double creditosExamen = Double.parseDouble(partes[0].trim());
                 int dificultad = Integer.parseInt(partes[1].trim());
-                int horas = calcularHoras(creditos, dificultad);
 
-                System.out.println("Asignatura=" + asignatura + " créditos=" + creditos + " dificultad=" + dificultad + " → horas estimadas=" + horas);
+                int horas = calcularHoras(creditosExamen, dificultad);
 
-                // Responder al Coordinador con INFORM
+                System.out.println("Asignatura:" + asignatura + " créditosExamen=" + creditosExamen + " dificultad=" + dificultad + " → horas recomendadas=" + horas);
+
                 ACLMessage respuesta = mensaje.createReply();
                 respuesta.setPerformative(ACLMessage.INFORM);
                 respuesta.setContent(String.valueOf(horas));
                 respuesta.setConversationId(convId);
-
                 myAgent.send(respuesta);
 
-                System.out.println("INFORM enviado al Coordinador" + " [convId=" + convId + ", horas=" + horas + "]");
+                System.out.println("INFORM enviado al Coordinador" + " convId=" + convId + ", horas=" + horas);
 
             } catch (Exception e) {
                 System.err.println("Error al procesar mensaje -> " + e.getMessage());
@@ -58,24 +56,20 @@ public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
         }
     }
 
-    /**
-     * Fórmula de estimación de horas de estudio:
-     *
-     * Base: creditos * FACTOR  → horas "base" proporcionales al peso de la asignatura
-     * Multiplicador de dificultad: escala 1-10, normalizada a rango [0.5 … 2.0]
-     * dificultad=1  → × 0.5  (muy fácil, menos horas)
-     * dificultad=5  → × 1.0  (media)
-     * dificultad=10 → × 2.0  (muy difícil, el doble)
-     *
-     * Resultado mínimo garantizado: 1 hora.
-     */
-    private int calcularHoras(int creditos, int dificultad) {
-        // Normalizar dificultad: [1..10] → [0.5..2.0]
-        double factorDificultad = 0.5 + (dificultad - 1) * (1.5 / 9.0);
+    private int calcularHoras(double creditosExamen, int dificultad) {
+        double horasBase = creditosExamen * HORAS_POR_CREDITO;
 
-        double horas = creditos * FACTOR * factorDificultad;
+        double multiplicador;
+        if (dificultad <= 3) {
+            multiplicador = 0.5;
+        } else if (dificultad <= 6) {
+            multiplicador = 1.0;
+        } else if (dificultad <= 9) {
+            multiplicador = 1.5;
+        } else {
+            multiplicador = 2.0;
+        }
 
-        // Redondear al entero más cercano, mínimo 1
-        return Math.max(1, (int) Math.round(horas));
+        return (int) Math.round(horasBase * multiplicador);
     }
 }
