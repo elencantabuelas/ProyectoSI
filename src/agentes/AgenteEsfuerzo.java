@@ -39,7 +39,6 @@ public class AgenteEsfuerzo extends Agent {
             dfd.addServices(sd);
 
             DFService.register(this, dfd);
-            System.out.println("AgenteEsfuerzo: registrado en el DF.");
         } catch (FIPAException e) {
             System.err.println("AgenteEsfuerzo: error al registrar en el DF -> " + e.getMessage());
             doDelete();
