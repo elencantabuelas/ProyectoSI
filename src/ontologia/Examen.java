@@ -5,9 +5,10 @@ import jade.content.Concept;
 public class Examen implements Concept
 {
     private String asignatura;
-    private int creditos;
+    private double creditos;
     private int dificultad;
     private int diasAntesExamen;
+    private double notaDeseada;
 
     public Examen()
     {
@@ -23,12 +24,12 @@ public class Examen implements Concept
         this.asignatura = asignatura;
     }
 
-    public int getCreditos()
+    public double getCreditos()
     {
         return creditos;
     }
 
-    public void setCreditos(int creditos)
+    public void setCreditos(double creditos)
     {
         this.creditos = creditos;
     }
@@ -52,4 +53,15 @@ public class Examen implements Concept
     {
         this.diasAntesExamen = diasAntesExamen;
     }
+
+    public double getNotaDeseada()
+    {
+        return notaDeseada;
+    }
+
+    public void setNotaDeseada(double notaDeseada)
+    {
+        this.notaDeseada = notaDeseada;
+    }
+
 }

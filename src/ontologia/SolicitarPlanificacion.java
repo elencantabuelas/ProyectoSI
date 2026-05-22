@@ -4,19 +4,19 @@ import jade.content.AgentAction;
 
 public class SolicitarPlanificacion implements AgentAction {
 
-    private Examen examen;
+    private ListaExamenes listaExamenes;
 
     public SolicitarPlanificacion()
     {
     }
 
-    public Examen getExamen()
+    public ListaExamenes getListaExamenes()
     {
-        return examen;
+        return listaExamenes;
     }
 
-    public void setExamen(Examen examen)
+    public void setListaExamenes(ListaExamenes listaExamenes)
     {
-        this.examen = examen;
+        this.listaExamenes = listaExamenes;
     }
 }

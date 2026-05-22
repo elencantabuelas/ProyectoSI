@@ -9,7 +9,7 @@ import ontologia.OntologiaExamenes;
 
 public class AgenteInterfaz extends Agent
 {
-    private final Codec codec = new SLCodec();
+    private final Codec codec = new SLCodec(); //lenguaje FIPA-SL
     private final Ontology ontologia = OntologiaExamenes.getInstance();
 
     @Override
@@ -21,5 +21,11 @@ public class AgenteInterfaz extends Agent
         System.out.println("AgenteInterfaz iniciado: " + getLocalName());
 
         addBehaviour(new EnviarExamenBehaviour(this, codec, ontologia));
+    }
+
+    @Override
+    protected void takeDown()
+    {
+        System.out.println("Agente Interfaz (" + getAID().getName() + ") terminando.");
     }
 }
