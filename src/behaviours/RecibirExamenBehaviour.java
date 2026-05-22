@@ -6,6 +6,10 @@ import jade.content.onto.Ontology;
 import jade.content.onto.basic.Action;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import ontologia.Examen;
@@ -13,6 +17,8 @@ import ontologia.SolicitarPlanificacion;
 import jade.core.AID;
 import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
+
+import static utils.UtilidadesDF.buscarServicio;
 
 public class RecibirExamenBehaviour extends CyclicBehaviour {
 
@@ -48,6 +54,7 @@ public class RecibirExamenBehaviour extends CyclicBehaviour {
                 //extraemos la solicitud de la ontologia
                 SolicitarPlanificacion solicitud = (SolicitarPlanificacion) ((Action) ce).getAction();
                 Examen examen = solicitud.getExamen();
+                System.out.println("COORDINADOR: Recibido examen de " + examen.getAsignatura() + ". Delegando tareas...");
 
                 //comportamiento paralelo
                 ParallelBehaviour pb = new ParallelBehaviour(myAgent, ParallelBehaviour.WHEN_ALL);
@@ -55,33 +62,42 @@ public class RecibirExamenBehaviour extends CyclicBehaviour {
                     @Override
                     public void action() {
                         //envio a AgenteEsfuerzo
-                        ACLMessage msgEsfuerzo = new ACLMessage(ACLMessage.REQUEST);
-                        msgEsfuerzo.addReceiver(new AID(NOMBRE_ESFUERZO, AID.ISLOCALNAME));
+                        AID agenteEsfuerzo = buscarServicio(myAgent,"calculo-esfuerzo");
 
-                        //le enviamos creditos y dificultad
-                        String contenido = examen.getCreditos() + "," + examen.getDificultad();
-                        msgEsfuerzo.setContent(contenido);
+                        if(agenteEsfuerzo != null){
+                            ACLMessage msgEsfuerzo = new ACLMessage(ACLMessage.REQUEST);
+                            msgEsfuerzo.addReceiver(agenteEsfuerzo);
+                            msgEsfuerzo.addReplyTo(new AID("AgenteEnsamblador", AID.ISLOCALNAME));
 
-                        // como habrá más conversaciones con el agente le pongo un ID a la conversación, para encontrarlo después
-                        msgEsfuerzo.setConversationId("calculo-" + examen.getAsignatura());
+                            //le enviamos creditos y dificultad
+                            String contenido = examen.getCreditos() + "," + examen.getDificultad();
+                            msgEsfuerzo.setContent(contenido);
+                            msgEsfuerzo.setConversationId("calculo-" + examen.getAsignatura());
 
-                        myAgent.send(msgEsfuerzo);
+                            myAgent.send(msgEsfuerzo);
+                        }
+
                     }
                 });
                 pb.addSubBehaviour(new OneShotBehaviour() {
                     @Override
                     public void action() {
                         //envio a AgenteUrgencia
-                        ACLMessage msgUrgencia = new ACLMessage(ACLMessage.REQUEST);
-                        msgUrgencia.addReceiver(new AID(NOMBRE_URGENCIA, AID.ISLOCALNAME));
+                        AID agenteUrgencia = buscarServicio(myAgent,"calculo-urgencia");
 
-                        //le enviamos los dias que faltan
-                        String contenido = String.valueOf(examen.getDiasAntesExamen());
-                        msgUrgencia.setContent(contenido);
+                        if(agenteUrgencia != null){
+                            ACLMessage msgUrgencia = new ACLMessage(ACLMessage.REQUEST);
+                            msgUrgencia.addReceiver(new AID(NOMBRE_URGENCIA, AID.ISLOCALNAME));
 
-                        msgUrgencia.setConversationId("calculo-" + examen.getAsignatura());
+                            //le enviamos los dias que faltan
+                            String contenido = String.valueOf(examen.getDiasAntesExamen());
+                            msgUrgencia.setContent(contenido);
 
-                        myAgent.send(msgUrgencia);
+                            msgUrgencia.setConversationId("calculo-" + examen.getAsignatura());
+
+                            myAgent.send(msgUrgencia);
+                        }
+
                     }
                 });
 
