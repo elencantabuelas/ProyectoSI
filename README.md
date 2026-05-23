@@ -37,7 +37,7 @@ o puedes usar github desktop
 
 # 2. Dependencias Necesarias
 
-<img height="200" src="C:\Users\gavir\IdeaProjects\ProyectoSI\dependencias.png" width="500"/>
+<img height="200" src="dependencias.png" width="500"/>
 
 # 3. Instrucciones de Ejecución
 
