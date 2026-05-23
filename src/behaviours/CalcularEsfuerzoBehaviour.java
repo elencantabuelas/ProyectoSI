@@ -68,13 +68,23 @@ public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
                 AID ensamblador = buscarServicio(myAgent, SERVICIO_ENSAMBLADOR);
 
                 if (ensamblador != null) {
-                    ACLMessage msgEnsamblador = new ACLMessage(ACLMessage.INFORM);
-                    msgEnsamblador.addReceiver(ensamblador);
-                    msgEnsamblador.setContent("asignatura=" + asignatura + ";horas=" + horas);
-                    msgEnsamblador.setConversationId(convId);
-                    myAgent.send(msgEnsamblador);
+                    System.out.println("[Esfuerzo] Enviando datos al ensamblador en dos mensajes...");
 
-                    System.out.println("convId=" + convId + ", horas=" + horas);
+                    // ---ENVIO DOS MENSAJES ---
+                    // 1 asignatura
+                    ACLMessage msgAsignatura = new ACLMessage(ACLMessage.INFORM);
+                    msgAsignatura.addReceiver(ensamblador);
+                    msgAsignatura.setConversationId(convId);
+                    msgAsignatura.setContent("asignatura=" + asignatura);
+                    myAgent.send(msgAsignatura);
+
+                    // 2 Las horas
+                    ACLMessage msgHoras = new ACLMessage(ACLMessage.INFORM);
+                    msgHoras.addReceiver(ensamblador);
+                    msgHoras.setConversationId(convId);
+                    msgHoras.setContent("horas=" + horas);
+                    myAgent.send(msgHoras);
+
                 } else {
                     System.err.println("AgenteEsfuerzo: No se encontró el AgenteEnsamblador en el DF.");
                 }
