@@ -37,7 +37,7 @@ o puedes usar github desktop
 
 # 2. Dependencias Necesarias
 
-![[dependencias.png]]
+![](C:\Users\gavir\IdeaProjects\ProyectoSI\dependencias.png)
 # 3. Instrucciones de Ejecución
 
 Para arrancar la plataforma JADE y lanzar nuestros agentes:
@@ -142,5 +142,5 @@ flowchart TD
     class E ensamblador;
 
 `````
-## 6. Declaración de IA
+# 6. Declaración de IA
 
