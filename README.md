@@ -109,7 +109,7 @@ flowchart TB
     B -- n°examenes<br>asignatura<br>nota deseada<br>dias antes del examen --> D["`**Agente Urgencia**`"]
     C -- {asignatura, horas} --> E["Agente Ensamblador"]
     D -- {asignatura, prioridad} --> E
-    A -- Numero de Examenes --> E
+    B -- Numero de Examenes --> E
 
      A:::interfaz
      B:::coordinador
