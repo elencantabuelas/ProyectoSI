@@ -18,6 +18,8 @@ import jade.core.AID;
 import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 
+import java.util.List;
+
 import static utils.UtilidadesDF.buscarServicio;
 
 public class RecibirExamenBehaviour extends CyclicBehaviour {
@@ -53,8 +55,9 @@ public class RecibirExamenBehaviour extends CyclicBehaviour {
                 ContentElement ce = myAgent.getContentManager().extractContent(mensaje);
                 //extraemos la solicitud de la ontologia
                 SolicitarPlanificacion solicitud = (SolicitarPlanificacion) ((Action) ce).getAction();
-                Examen examen = solicitud.getExamen();
-                System.out.println("COORDINADOR: Recibido examen de " + examen.getAsignatura() + ". Delegando tareas...");
+                List<Examen> examenes = solicitud.getListaExamenes().getExamenes();
+
+                int totalExamenes = examenes.size();
 
                 //comportamiento paralelo
                 ParallelBehaviour pb = new ParallelBehaviour(myAgent, ParallelBehaviour.WHEN_ALL);
@@ -62,44 +65,54 @@ public class RecibirExamenBehaviour extends CyclicBehaviour {
                     @Override
                     public void action() {
                         //envio a AgenteEsfuerzo
-                        AID agenteEsfuerzo = buscarServicio(myAgent,"calculo-esfuerzo");
+                        AID agenteEsfuerzo = buscarServicio(myAgent, "calculo-esfuerzo");
 
-                        if(agenteEsfuerzo != null){
-                            ACLMessage msgEsfuerzo = new ACLMessage(ACLMessage.REQUEST);
-                            msgEsfuerzo.addReceiver(agenteEsfuerzo);
-                            msgEsfuerzo.addReplyTo(new AID("AgenteEnsamblador", AID.ISLOCALNAME));
+                        if (agenteEsfuerzo != null) {
 
-                            //le enviamos creditos y dificultad
-                            String contenido = examen.getCreditos() + "," + examen.getDificultad();
-                            msgEsfuerzo.setContent(contenido);
-                            msgEsfuerzo.setConversationId("calculo-" + examen.getAsignatura());
+                            for (Examen examen : examenes) {
+                                ACLMessage msgEsfuerzo = new ACLMessage(ACLMessage.REQUEST);
+                                msgEsfuerzo.addReceiver(agenteEsfuerzo);
+                                msgEsfuerzo.addReplyTo(new AID("AgenteEnsamblador", AID.ISLOCALNAME));
+                                String contenido = totalExamenes + "," +
+                                        examen.getAsignatura() + "," +
+                                        examen.getNotaDeseada() + "," +
+                                        examen.getCreditos() + "," +
+                                        examen.getDificultad();
 
-                            myAgent.send(msgEsfuerzo);
+                                msgEsfuerzo.setContent(contenido);
+                                msgEsfuerzo.setConversationId("calculo-" + examen.getAsignatura());
+
+                                myAgent.send(msgEsfuerzo);
+
+                            }
+
                         }
-
                     }
                 });
+
                 pb.addSubBehaviour(new OneShotBehaviour() {
                     @Override
                     public void action() {
                         //envio a AgenteUrgencia
-                        AID agenteUrgencia = buscarServicio(myAgent,"calculo-urgencia");
-
+                        AID agenteUrgencia = buscarServicio(myAgent, "calculo-urgencia");
                         if(agenteUrgencia != null){
-                            ACLMessage msgUrgencia = new ACLMessage(ACLMessage.REQUEST);
-                            msgUrgencia.addReceiver(agenteUrgencia); // Usamos el agente encontrado en el DF
+                            for (Examen examen : examenes) {
+                                ACLMessage msgUrgencia = new ACLMessage(ACLMessage.REQUEST);
+                                msgUrgencia.addReceiver(agenteUrgencia);
+                                String contenido = totalExamenes + "," +
+                                                    examen.getAsignatura() + "," +
+                                                    examen.getNotaDeseada() + "," +
+                                                    examen.getDiasAntesExamen();
 
-                            //le enviamos los dias que faltan
-                            String contenido = String.valueOf(examen.getDiasAntesExamen());
-                            msgUrgencia.setContent(contenido);
+                                msgUrgencia.setContent(contenido);
+                                msgUrgencia.setConversationId("calculo-" + examen.getAsignatura());
 
-                            msgUrgencia.setConversationId("calculo-" + examen.getAsignatura());
+                                myAgent.send(msgUrgencia);
 
-                            myAgent.send(msgUrgencia);
+                                }
+                            }
                         }
-
-                    }
-                });
+                    });
 
                 myAgent.addBehaviour(pb);
 
@@ -112,7 +125,6 @@ public class RecibirExamenBehaviour extends CyclicBehaviour {
         else{
             block();
         }
-
 
     }
 }

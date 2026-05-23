@@ -1,15 +1,11 @@
 package agentes;
 
-import behaviours.ProcesarPlanBehaviour;
 import behaviours.RecibirExamenBehaviour;
-import behaviours.RecibirRespuestasCalculoBehaviour;
 import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.Ontology;
 import jade.core.Agent;
 import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import ontologia.OntologiaExamenes;
 
