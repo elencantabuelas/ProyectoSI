@@ -37,7 +37,8 @@ o puedes usar github desktop
 
 # 2. Dependencias Necesarias
 
-![](C:\Users\gavir\IdeaProjects\ProyectoSI\dependencias.png)
+<img height="200" src="C:\Users\gavir\IdeaProjects\ProyectoSI\dependencias.png" width="500"/>
+
 # 3. Instrucciones de Ejecución
 
 Para arrancar la plataforma JADE y lanzar nuestros agentes:
