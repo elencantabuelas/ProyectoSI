@@ -1,15 +1,35 @@
 package behaviours;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import static utils.UtilidadesDF.buscarServicio;
+
+/**
+ * Fórmula: horasBase = creditos × 10; horas = horasBase × dificultad × nota
+ *
+ * Factor dificultad:
+ *   1-3  → × 0.5
+ *   4-6  → × 1.0
+ *   7-9  → × 1.5
+ *   10   → × 2.0
+ *
+ * Factor nota deseada:
+ *   5-6  → × 1.0
+ *   7-8  → × 1.25
+ *   9-10 → × 1.5
+ */
+
 public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
 
     private static final int HORAS_POR_CREDITO = 10;
+    private static final String SERVICIO_ENSAMBLADOR = "ensamblador-plan";
 
-    private static final MessageTemplate MT = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
+    private static final MessageTemplate MT =
+            MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 
     public CalcularEsfuerzoBehaviour(Agent agente) {
         super(agente);
@@ -27,27 +47,40 @@ public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
                 return;
             }
 
-            String asignatura = convId.replace("calculo-", "");
-
             try {
-                String[] partes = contenido.split(",");
-                double creditosExamen = Double.parseDouble(partes[0].trim());
-                int dificultad = Integer.parseInt(partes[1].trim());
+                // Formato: "totalExamenes,asignatura,notaDeseada,creditos,dificultad"
+                String[] partes    = contenido.split(",");
+                int totalExamenes  = Integer.parseInt(partes[0].trim());
+                String asignatura  = partes[1].trim();
+                double notaDeseada = Double.parseDouble(partes[2].trim());
+                double creditos    = Double.parseDouble(partes[3].trim());
+                int dificultad     = Integer.parseInt(partes[4].trim());
 
-                int horas = calcularHoras(creditosExamen, dificultad);
+                int horas = calcularHoras(creditos, dificultad, notaDeseada);
 
-                System.out.println("Asignatura:" + asignatura + " créditosExamen=" + creditosExamen + " dificultad=" + dificultad + " → horas recomendadas=" + horas);
+                System.out.println("Asignatura:" + asignatura
+                        + " creditos=" + creditos
+                        + " dificultad=" + dificultad
+                        + " notaDeseada=" + notaDeseada
+                        + " totalExamenes=" + totalExamenes
+                        + " → horas recomendadas=" + horas);
 
-                ACLMessage respuesta = mensaje.createReply();
-                respuesta.setPerformative(ACLMessage.INFORM);
-                respuesta.setContent(String.valueOf(horas));
-                respuesta.setConversationId(convId);
-                myAgent.send(respuesta);
+                AID ensamblador = buscarServicio(myAgent, SERVICIO_ENSAMBLADOR);
 
-                System.out.println("INFORM enviado al Coordinador" + " convId=" + convId + ", horas=" + horas);
+                if (ensamblador != null) {
+                    ACLMessage msgEnsamblador = new ACLMessage(ACLMessage.INFORM);
+                    msgEnsamblador.addReceiver(ensamblador);
+                    msgEnsamblador.setContent("horas," + horas);
+                    msgEnsamblador.setConversationId(convId); 
+                    myAgent.send(msgEnsamblador);
+
+                    System.out.println("convId=" + convId + ", horas=" + horas);
+                } else {
+                    System.err.println("AgenteEsfuerzo: No se encontró el AgenteEnsamblador en el DF.");
+                }
 
             } catch (Exception e) {
-                System.err.println("Error al procesar mensaje -> " + e.getMessage());
+                System.err.println("AgenteEsfuerzo: Error al procesar mensaje -> " + e.getMessage());
                 e.printStackTrace();
             }
 
@@ -56,20 +89,31 @@ public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
         }
     }
 
-    private int calcularHoras(double creditosExamen, int dificultad) {
-        double horasBase = creditosExamen * HORAS_POR_CREDITO;
+    private int calcularHoras(double creditos, int dificultad, double notaDeseada) {
+        double horasBase = creditos * HORAS_POR_CREDITO;
 
-        double multiplicador;
+        // Factor por dificultad
+        double factorDificultad;
         if (dificultad <= 3) {
-            multiplicador = 0.5;
+            factorDificultad = 0.5;
         } else if (dificultad <= 6) {
-            multiplicador = 1.0;
+            factorDificultad = 1.0;
         } else if (dificultad <= 9) {
-            multiplicador = 1.5;
+            factorDificultad = 1.5;
         } else {
-            multiplicador = 2.0;
+            factorDificultad = 2.0;
         }
 
-        return (int) Math.round(horasBase * multiplicador);
+        // Factor por nota deseada
+        double factorNota;
+        if (notaDeseada <= 6) {
+            factorNota = 1.0;
+        } else if (notaDeseada <= 8) {
+            factorNota = 1.25;
+        } else {
+            factorNota = 1.5;
+        }
+
+        return (int) Math.round(horasBase * factorDificultad * factorNota);
     }
 }
