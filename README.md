@@ -98,7 +98,6 @@ Nota deseada: 7
 
 
 ```mermaid
-
 ---
 config:
   layout: elk
@@ -110,6 +109,7 @@ flowchart TB
     B -- n°examenes<br>asignatura<br>nota deseada<br>dias antes del examen --> D["`**Agente Urgencia**`"]
     C -- {asignatura, horas} --> E["Agente Ensamblador"]
     D -- {asignatura, prioridad} --> E
+    A -- Numero de Examenes --> E
 
      A:::interfaz
      B:::coordinador
@@ -126,7 +126,6 @@ flowchart TB
     style C stroke:#ffffff,fill:#000000,font-size:14px,color:#ffffff
     style D fill:#000000,stroke:#ffffff,color:#ffffff
     style E stroke:#ffffff,color:#ffffff,fill:#000000
-
 `````
 # 6. Declaración de IA
 
