@@ -28,38 +28,40 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
         if (msg != null) {
             String conversationId = msg.getConversationId();
             String contenido = msg.getContent();
-            System.out.println("[Ensamblador] Recibido dato parcial de " + msg.getSender().getLocalName() + " para la conversación: " + conversationId);
+            System.out.println("[Ensamblador] Recibido dato de " + msg.getSender().getLocalName() + " para la conversación: " + conversationId);
             System.out.println("[Ensamblador] Contenido: " + contenido);
 
             if (conversationId == null) {
-                // Si no hay ID de conversación, no podemos procesarlo.
-                return;
+                return; // Ignorar mensajes sin ID de conversación
             }
 
-            // El contenido esperado es del tipo "clave=valor", por ejemplo, "asignatura=Sistemas Inteligentes"
-            String[] partes = contenido.split("=");
-            if (partes.length == 2) {
-                String clave = partes[0].trim();
-                String valor = partes[1].trim();
+            // El contenido esperado es "clave1=valor1;clave2=valor2"
+            String[] bloques = contenido.split(";");
 
-                // Guardamos el dato en el mapa correspondiente
-                switch (clave) {
-                    case "asignatura":
-                        asignaturas.put(conversationId, valor);
-                        break;
-                    case "horas":
-                        horasRecibidas.put(conversationId, valor);
-                        break;
-                    case "prioridad":
-                        prioridadesRecibidas.put(conversationId, valor);
-                        break;
+            for (String bloque : bloques) {
+                String[] par = bloque.split("=");
+                if (par.length == 2) {
+                    String clave = par[0].trim();
+                    String valor = par[1].trim();
+
+                    // Guardamos el dato en el mapa correspondiente
+                    switch (clave) {
+                        case "asignatura":
+                            asignaturas.put(conversationId, valor);
+                            break;
+                        case "horas":
+                            horasRecibidas.put(conversationId, valor);
+                            break;
+                        case "prioridad":
+                            prioridadesRecibidas.put(conversationId, valor);
+                            break;
+                    }
                 }
             }
 
             // --- Comprobación de si tenemos todos los datos ---
             if (asignaturas.containsKey(conversationId) && horasRecibidas.containsKey(conversationId) && prioridadesRecibidas.containsKey(conversationId)) {
                 
-                // ¡Tenemos toda la información!
                 String asignatura = asignaturas.get(conversationId);
                 String horas = horasRecibidas.get(conversationId);
                 String prioridad = prioridadesRecibidas.get(conversationId);
@@ -73,7 +75,7 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
                 System.out.println("-> Nivel de prioridad: " + prioridad);
                 System.out.println("-------------------------------------------\n");
 
-                // Limpiamos los mapas para esta conversación para no volver a procesarla.
+                // Limpiamos los mapas para esta conversación.
                 asignaturas.remove(conversationId);
                 horasRecibidas.remove(conversationId);
                 prioridadesRecibidas.remove(conversationId);
