@@ -4,14 +4,21 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.wrapper.StaleProxyException;
 
 import javax.swing.JOptionPane;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ProcesarPlanBehaviour extends CyclicBehaviour {
 
-    // Mapas para guardar el estado de los planes en proceso, usando el ID de conversación como clave
+    //Variables de Estado para Acumular Resultados
+    private int totalPlanesEsperados = 0;
+    private final List<String> planesCompletados = new ArrayList<>();
+
+    // Mapas para guardar las piezas de cada plan en proceso
     private final Map<String, String> asignaturas = new HashMap<>();
     private final Map<String, String> horasRecibidas = new HashMap<>();
     private final Map<String, String> prioridadesRecibidas = new HashMap<>();
@@ -22,73 +29,104 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
-        // Esperamos mensajes de tipo INFORM que contengan datos para el plan
         MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
         ACLMessage msg = myAgent.receive(mt);
 
         if (msg != null) {
-            String conversationId = msg.getConversationId();
             String contenido = msg.getContent();
-            System.out.println("[Ensamblador] Recibido dato de " + msg.getSender().getLocalName() + " para la conversación: " + conversationId);
+            System.out.println("[Ensamblador] Recibido INFORM de " + msg.getSender().getLocalName());
             System.out.println("[Ensamblador] Contenido: " + contenido);
 
-            if (conversationId == null) {
-                return; // Ignorar mensajes sin ID de conversación
-            }
-
-            // El contenido esperado es "clave1=valor1;clave2=valor2"
-            String[] bloques = contenido.split(";");
-
-            for (String bloque : bloques) {
-                String[] par = bloque.split("=");
-                if (par.length == 2) {
-                    String clave = par[0].trim();
-                    String valor = par[1].trim();
-
-                    // se guarda el dato
-                    switch (clave) {
-                        case "asignatura":
-                            asignaturas.put(conversationId, valor);
-                            break;
-                        case "horas":
-                            horasRecibidas.put(conversationId, valor);
-                            break;
-                        case "prioridad":
-                            prioridadesRecibidas.put(conversationId, valor);
-                            break;
-                    }
+            // procesar mensajes
+            if (contenido.startsWith("totalExamenes=")) {
+                //Mensaje del Coordinador con el total de planes a esperar
+                try {
+                    totalPlanesEsperados = Integer.parseInt(contenido.split("=")[1]);
+                    planesCompletados.clear();//Reseteamos por si acaso
+                    System.out.println("[Ensamblador] Se esperan " + totalPlanesEsperados + " planes en total.");
+                } catch (Exception e) {
+                    System.err.println("[Ensamblador] Error al leer el total de exámenes.");
                 }
-            }
-
-            // --- compruebo de si tenemos todos los datos ---
-            if (asignaturas.containsKey(conversationId) && horasRecibidas.containsKey(conversationId) && prioridadesRecibidas.containsKey(conversationId)) {
-                
-                String asignatura = asignaturas.get(conversationId);
-                String horas = horasRecibidas.get(conversationId);
-                String prioridad = prioridadesRecibidas.get(conversationId);
-
-                //mensaje a mostrar
-                String mensajeResultado = "Asignatura: " + asignatura + "\n"
-                                        + "Horas de estudio recomendadas: " + horas + "\n"
-                                        + "Nivel de prioridad: " + prioridad;
-
-                //mensaje en una ventana emergente
-                JOptionPane.showMessageDialog(
-                        null,
-                        mensajeResultado,
-                        "Plan de Estudio Generado",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
-
-                // limpio los mapas de la comverzacion
-                asignaturas.remove(conversationId);
-                horasRecibidas.remove(conversationId);
-                prioridadesRecibidas.remove(conversationId);
+            } else {
+                //Mensaje de los agentes Esfurzo y Urgencia
+                String conversationId = msg.getConversationId();
+                if (conversationId == null) return;
+                procesarDatosParciales(conversationId, contenido);
             }
 
         } else {
-            // Si no hay mensajes el comportamiento se bloquea hasta que llegue uno nuevo
             block();
+        }
+    }
+
+    private void procesarDatosParciales(String conversationId, String contenido) {
+        String[] bloques = contenido.split(";");
+        for (String bloque : bloques) {
+            String[] par = bloque.split("=");
+            if (par.length == 2) {
+                String clave = par[0].trim();
+                String valor = par[1].trim();
+                switch (clave) {
+                    case "asignatura": asignaturas.put(conversationId, valor); break;
+                    case "horas": horasRecibidas.put(conversationId, valor); break;
+                    case "prioridad": prioridadesRecibidas.put(conversationId, valor); break;
+                }
+            }
+        }
+
+        // Compruevo si un plan esta completo
+        if (asignaturas.containsKey(conversationId) && horasRecibidas.containsKey(conversationId) && prioridadesRecibidas.containsKey(conversationId)) {
+            
+            String asignatura = asignaturas.get(conversationId);
+            String horas = horasRecibidas.get(conversationId);
+            String prioridad = prioridadesRecibidas.get(conversationId);
+
+            // Formatear y añadir el plan completado a la lista
+            String planFormateado = "Asignatura: " + asignatura + "\n"
+                                  + "  - Horas recomendadas: " + horas + "\n"
+                                  + "  - Prioridad: " + prioridad + "\n";
+            planesCompletados.add(planFormateado);
+            System.out.println("[Ensamblador] Plan para '" + asignatura + "' completado y añadido a la lista. (" + planesCompletados.size() + "/" + totalPlanesEsperados + ")");
+
+            // Limpiar los mapas para este plan
+            asignaturas.remove(conversationId);
+            horasRecibidas.remove(conversationId);
+            prioridadesRecibidas.remove(conversationId);
+
+            // Compruevo si todos los planes han llegado
+            if (totalPlanesEsperados > 0 && planesCompletados.size() >= totalPlanesEsperados) {
+                mostrarResultadosFinalesYApagar();
+            }
+        }
+    }
+
+    private void mostrarResultadosFinalesYApagar() {
+        // Construir el string final con todos los planes
+        StringBuilder sb = new StringBuilder("Se han generado todos los planes de estudio:\n\n");
+        for (String plan : planesCompletados) {
+            sb.append(plan).append("\n");
+        }
+
+        // Mostrar la ventana emergente final
+        JOptionPane.showMessageDialog(
+                null,
+                sb.toString(),
+                "Planes de Estudio Generados",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
+        // Limpiar estado
+        planesCompletados.clear();
+        totalPlanesEsperados = 0;
+
+        // Iniciar el apagado de la plataforma JADE y el programa
+        try {
+            System.out.println("[Ensamblador] Todo el trabajo completado. Apagando la plataforma...");
+            myAgent.getContainerController().kill();
+            System.out.println("Cerrando la aplicación...");
+            System.exit(0);
+        } catch (StaleProxyException e) {
+            System.err.println("[Ensamblador] Error al intentar apagar el contenedor: " + e.getMessage());
         }
     }
 }
