@@ -2,6 +2,16 @@
 
 ## Descripción del Proyecto
 
+Este programa actúa como un asistente automatizado que genera planes de estudio personalizados para ayudar a un estudiante a organizar la preparación de sus exámenes.
+
+El flujo de uso del sistema es el siguiente:
+
+- **1. Entrada de datos:** A través de una interfaz gráfica se introduce la información básica de sus próximos exámenes (Asignatura, Créditos, Porcentaje del examen, Dificultad, Días antes del examen, Nota deseada).
+
+- **2. Análisis Inteligente:** El sistema evalúa estos datos para calcular dos métricas clave por cada asignatura: el esfuerzo necesario (horas de estudio recomendadas) y el nivel de urgencia (prioridad del examen).
+
+- **3. Resultados:** El programa muestra un plan de estudio por cada Asignatura en una ventana emergente.
+
 
 ## Integrantes del Grupo
 
