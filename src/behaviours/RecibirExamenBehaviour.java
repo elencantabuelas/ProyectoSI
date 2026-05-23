@@ -66,13 +66,11 @@ public class RecibirExamenBehaviour extends CyclicBehaviour {
                     public void action() {
                         //envio a AgenteEsfuerzo
                         AID agenteEsfuerzo = buscarServicio(myAgent, "calculo-esfuerzo");
-
                         if (agenteEsfuerzo != null) {
 
                             for (Examen examen : examenes) {
                                 ACLMessage msgEsfuerzo = new ACLMessage(ACLMessage.REQUEST);
                                 msgEsfuerzo.addReceiver(agenteEsfuerzo);
-                                msgEsfuerzo.addReplyTo(new AID("AgenteEnsamblador", AID.ISLOCALNAME));
                                 String contenido = totalExamenes + "," +
                                         examen.getAsignatura() + "," +
                                         examen.getNotaDeseada() + "," +
