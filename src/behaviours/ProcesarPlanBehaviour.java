@@ -5,12 +5,13 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import javax.swing.JOptionPane;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ProcesarPlanBehaviour extends CyclicBehaviour {
 
-    // Mapas para guardar el estado de los planes en proceso, usando el ID de conversación como clave.
+    // Mapas para guardar el estado de los planes en proceso, usando el ID de conversación como clave
     private final Map<String, String> asignaturas = new HashMap<>();
     private final Map<String, String> horasRecibidas = new HashMap<>();
     private final Map<String, String> prioridadesRecibidas = new HashMap<>();
@@ -21,7 +22,7 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
-        // Esperamos mensajes de tipo INFORM que contengan datos para el plan.
+        // Esperamos mensajes de tipo INFORM que contengan datos para el plan
         MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
         ACLMessage msg = myAgent.receive(mt);
 
@@ -44,7 +45,7 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
                     String clave = par[0].trim();
                     String valor = par[1].trim();
 
-                    // Guardamos el dato en el mapa correspondiente
+                    // se guarda el dato
                     switch (clave) {
                         case "asignatura":
                             asignaturas.put(conversationId, valor);
@@ -59,30 +60,34 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
                 }
             }
 
-            // --- Comprobación de si tenemos todos los datos ---
+            // --- compruebo de si tenemos todos los datos ---
             if (asignaturas.containsKey(conversationId) && horasRecibidas.containsKey(conversationId) && prioridadesRecibidas.containsKey(conversationId)) {
                 
                 String asignatura = asignaturas.get(conversationId);
                 String horas = horasRecibidas.get(conversationId);
                 String prioridad = prioridadesRecibidas.get(conversationId);
 
-                // --- Lógica de Ensamblaje del Plan ---
-                System.out.println("\n-------------------------------------------");
-                System.out.println("      PLAN DE ESTUDIO ENSAMBLADO         ");
-                System.out.println("-------------------------------------------");
-                System.out.println("Asignatura: " + asignatura);
-                System.out.println("-> Horas de estudio recomendadas: " + horas);
-                System.out.println("-> Nivel de prioridad: " + prioridad);
-                System.out.println("-------------------------------------------\n");
+                //mensaje a mostrar
+                String mensajeResultado = "Asignatura: " + asignatura + "\n"
+                                        + "Horas de estudio recomendadas: " + horas + "\n"
+                                        + "Nivel de prioridad: " + prioridad;
 
-                // Limpiamos los mapas para esta conversación.
+                //mensaje en una ventana emergente
+                JOptionPane.showMessageDialog(
+                        null,
+                        mensajeResultado,
+                        "Plan de Estudio Generado",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+                // limpio los mapas de la comverzacion
                 asignaturas.remove(conversationId);
                 horasRecibidas.remove(conversationId);
                 prioridadesRecibidas.remove(conversationId);
             }
 
         } else {
-            // Si no hay mensajes, el comportamiento se bloquea hasta que llegue uno nuevo.
+            // Si no hay mensajes el comportamiento se bloquea hasta que llegue uno nuevo
             block();
         }
     }
