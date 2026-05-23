@@ -70,8 +70,8 @@ public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
                 if (ensamblador != null) {
                     ACLMessage msgEnsamblador = new ACLMessage(ACLMessage.INFORM);
                     msgEnsamblador.addReceiver(ensamblador);
-                    msgEnsamblador.setContent("horas," + horas);
-                    msgEnsamblador.setConversationId(convId); 
+                    msgEnsamblador.setContent("asignatura=" + asignatura + ";horas=" + horas);
+                    msgEnsamblador.setConversationId(convId);
                     myAgent.send(msgEnsamblador);
 
                     System.out.println("convId=" + convId + ", horas=" + horas);
