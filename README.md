@@ -88,59 +88,34 @@ Nota deseada: 7
 
 
 ```mermaid
-%%{init: {"layout": "elk"}}%%
 
-flowchart TD
+---
+config:
+  layout: elk
+  theme: dark
+---
+flowchart TB
+    A["`**Agente Interfaz**`"] -- Lista Examenes --> B["`**Agente Coordinador**`"]
+    B -- n°examenes<br>asignatura<br>nota deseada<br>creditos<br>dificultad --> C["`**Agente Esfuerzo**`"]
+    B -- n°examenes<br>asignatura<br>nota deseada<br>dias antes del examen --> D["`**Agente Urgencia**`"]
+    C -- {asignatura, horas} --> E["Agente Ensamblador"]
+    D -- {asignatura, prioridad} --> E
 
-    A["Agente Interfaz"]
-
-    B["Agente Coordinador"]
-
-    C["Agente Esfuerzo"]
-
-    D["Agente Urgencia"]
-
-    E["Agente Ensamblador"]
-
-  
-
-    A -->|"Lista Examenes"| B
-
-  
-
-    B -->|"n°examenes<br>asignatura<br>nota deseada<br>creditos<br>dificultad"| C
-
-    B -->|"n°examenes<br>asignatura<br>nota deseada<br>dias antes del examen"| D
-
-  
-
-    C -->|"{asignatura, horas}"| E
-
-    D -->|"{asignatura, prioridad}"| E
-
-  
-
-    classDef interfaz stroke:#818cf8,fill:#eef2ff;
-
-    classDef coordinador stroke:#a78bfa,fill:#f5f3ff;
-
-    classDef esfuerzo stroke:#2dd4bf,fill:#f0fdfa;
-
-    classDef urgencia stroke:#fb923c,fill:#fff7ed;
-
-    classDef ensamblador stroke:#4ade80,fill:#f0fdf4;
-
-  
-
-    class A interfaz;
-
-    class B coordinador;
-
-    class C esfuerzo;
-
-    class D urgencia;
-
-    class E ensamblador;
+     A:::interfaz
+     B:::coordinador
+     C:::esfuerzo
+     D:::urgencia
+     E:::ensamblador
+    classDef interfaz stroke:#818cf8,fill:#eef2ff
+    classDef coordinador stroke:#a78bfa,fill:#f5f3ff
+    classDef esfuerzo stroke:#2dd4bf,fill:#f0fdfa
+    classDef urgencia stroke:#fb923c,fill:#fff7ed
+    classDef ensamblador stroke:#4ade80,fill:#f0fdf4
+    style A fill:#000000,stroke:#ffffff,color:#ffffff
+    style B color:#ffffff,fill:#000000,stroke:#ffffff
+    style C stroke:#ffffff,fill:#000000,font-size:14px,color:#ffffff
+    style D fill:#000000,stroke:#ffffff,color:#ffffff
+    style E stroke:#ffffff,color:#ffffff,fill:#000000
 
 `````
 # 6. Declaración de IA
