@@ -108,8 +108,7 @@ flowchart TB
     B -- n°examenes<br>asignatura<br>nota deseada<br>creditos<br>dificultad --> C["`**Agente Esfuerzo**`"]
     B -- n°examenes<br>asignatura<br>nota deseada<br>dias antes del examen --> D["`**Agente Urgencia**`"]
     C -- {asignatura, horas} --> E["Agente Ensamblador"]
-    D -- {asignatura, prioridad} --> E
-    B -- Numero de Examenes --> E
+    D -- {numero de examnes}  {asignatura, prioridad} --> E
 
      A:::interfaz
      B:::coordinador
