@@ -82,7 +82,7 @@ public class CalcularUrgenciaBehaviour extends CyclicBehaviour {
                             ACLMessage msgEnsamblador = new ACLMessage(ACLMessage.INFORM);
                             msgEnsamblador.addReceiver(agenteEnsamblador);
                             msgEnsamblador.setConversationId(cid);
-                            msgEnsamblador.setContent("asignatura=" + asignatura + ";prioridad=" + prioridad);
+                            msgEnsamblador.setContent("asignatura=" + asignatura + ";prioridad=" + prioridad+";diasRestantes=" + diasRestantes + ";notaDeseada="+notaDeseada);
                             myAgent.send(msgEnsamblador);
                         }
                     }
