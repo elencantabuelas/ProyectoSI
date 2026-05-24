@@ -22,6 +22,8 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
     private final Map<String, String> asignaturas = new HashMap<>();
     private final Map<String, String> horasRecibidas = new HashMap<>();
     private final Map<String, String> prioridadesRecibidas = new HashMap<>();
+    private final Map<String, String> diasRestantesRecibidos = new HashMap<>();
+    private final Map<String, String> notasDeseadasRecibidas = new HashMap<>();
 
     public ProcesarPlanBehaviour(Agent a) {
         super(a);
@@ -37,9 +39,7 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
             System.out.println("[Ensamblador] Recibido INFORM de " + msg.getSender().getLocalName());
             System.out.println("[Ensamblador] Contenido: " + contenido);
 
-            // procesar mensajes
             if (contenido.startsWith("totalExamenes=")) {
-                //Mensaje del Coordinador con el total de planes a esperar
                 try {
                     totalPlanesEsperados = Integer.parseInt(contenido.split("=")[1]);
                     System.out.println("[Ensamblador] Se esperan " + totalPlanesEsperados + " planes en total.");
@@ -47,12 +47,10 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
                     System.err.println("[Ensamblador] Error al leer el total de exámenes.");
                 }
             } else {
-                //Mensaje de los agentes Esfurzo y Urgencia
                 String conversationId = msg.getConversationId();
                 if (conversationId == null) return;
                 procesarDatosParciales(conversationId, contenido);
             }
-
         } else {
             block();
         }
@@ -69,30 +67,54 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
                     case "asignatura": asignaturas.put(conversationId, valor); break;
                     case "horas": horasRecibidas.put(conversationId, valor); break;
                     case "prioridad": prioridadesRecibidas.put(conversationId, valor); break;
+                    case "diasRestantes": diasRestantesRecibidos.put(conversationId, valor); break;
+                    case "notaDeseada": notasDeseadasRecibidas.put(conversationId, valor); break;
                 }
             }
         }
 
-        // Compruevo si un plan esta completo
-        if (asignaturas.containsKey(conversationId) && horasRecibidas.containsKey(conversationId) && prioridadesRecibidas.containsKey(conversationId)) {
+        // esperar 5 piezas de datos
+        if (asignaturas.containsKey(conversationId)
+                && horasRecibidas.containsKey(conversationId)
+                && prioridadesRecibidas.containsKey(conversationId)
+                && diasRestantesRecibidos.containsKey(conversationId)
+                && notasDeseadasRecibidas.containsKey(conversationId)) {
             
+            // logica de validacion
             String asignatura = asignaturas.get(conversationId);
-            String horas = horasRecibidas.get(conversationId);
+            String horasStr = horasRecibidas.get(conversationId);
             String prioridad = prioridadesRecibidas.get(conversationId);
+            String diasStr = diasRestantesRecibidos.get(conversationId);
+            String notaStr = notasDeseadasRecibidas.get(conversationId);
 
-            // Formatear y añadir el plan completado a la lista
-            String planFormateado = "Asignatura: " + asignatura + "\n"
-                                  + "  - Horas recomendadas: " + horas + "\n"
-                                  + "  - Prioridad: " + prioridad + "\n";
-            planesCompletados.add(planFormateado);
+            int horasNum = Integer.parseInt(horasStr);
+            int diasNum = Integer.parseInt(diasStr);
+            double notaNum = Double.parseDouble(notaStr);
+
+            StringBuilder planBuilder = new StringBuilder();
+            planBuilder.append("Asignatura: ").append(asignatura).append("\n");
+            planBuilder.append("  - Horas recomendadas: ").append(horasNum).append("\n");
+            planBuilder.append("  - Prioridad: ").append(prioridad).append("\n");
+
+            // Aplicamos la lógica de validación
+            if (horasNum > (diasNum * 12) && notaNum > 5) {
+                planBuilder.append("    ¡AVISO!: Las horas de estudio son muy altas para los días disponibles.\n");
+                planBuilder.append("    Se recomienda bajar la nota deseada para hacer el plan más realista.\n");
+            } else if (horasNum > (diasNum * 12) && notaNum <= 5) {
+                planBuilder.append("    ¡ALERTA CRÍTICA!: El plan de estudio para esta asignatura es inviable.\n");
+                planBuilder.append("    Considere dejar la carrera y postular a una FP.\n");
+            }
+
+            planesCompletados.add(planBuilder.toString());
             System.out.println("[Ensamblador] Plan para '" + asignatura + "' completado y añadido a la lista. (" + planesCompletados.size() + "/" + totalPlanesEsperados + ")");
 
             // Limpiar los mapas para este plan
             asignaturas.remove(conversationId);
             horasRecibidas.remove(conversationId);
             prioridadesRecibidas.remove(conversationId);
+            diasRestantesRecibidos.remove(conversationId);
+            notasDeseadasRecibidas.remove(conversationId);
 
-            // Compruevo si todos los planes han llegado
             if (totalPlanesEsperados > 0 && planesCompletados.size() >= totalPlanesEsperados) {
                 mostrarResultadosFinalesYApagar();
             }
@@ -100,13 +122,11 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
     }
 
     private void mostrarResultadosFinalesYApagar() {
-        // Construir el string final con todos los planes
         StringBuilder sb = new StringBuilder("Se han generado todos los planes de estudio:\n\n");
         for (String plan : planesCompletados) {
             sb.append(plan).append("\n");
         }
 
-        // Mostrar la ventana emergente final
         JOptionPane.showMessageDialog(
                 null,
                 sb.toString(),
@@ -114,15 +134,12 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
                 JOptionPane.INFORMATION_MESSAGE
         );
 
-        // Limpiar estado
         planesCompletados.clear();
         totalPlanesEsperados = 0;
 
-        // Iniciar el apagado de la plataforma JADE y el programa
         try {
             System.out.println("[Ensamblador] Todo el trabajo completado. Apagando la plataforma...");
             myAgent.getContainerController().kill();
-            System.out.println("Cerrando la aplicación...");
             System.exit(0);
         } catch (StaleProxyException e) {
             System.err.println("[Ensamblador] Error al intentar apagar el contenedor: " + e.getMessage());
