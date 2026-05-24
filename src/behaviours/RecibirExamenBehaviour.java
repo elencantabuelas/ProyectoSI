@@ -57,19 +57,6 @@ public class RecibirExamenBehaviour extends CyclicBehaviour {
                 SolicitarPlanificacion solicitud = (SolicitarPlanificacion) ((Action) ce).getAction();
                 List<Examen> examenes = solicitud.getListaExamenes().getExamenes();
 
-                // --- CAMBIO PARA ENVIAR AL ENSAMBLADOR EL TOTAL DE EXAMENES ---
-                AID ensamblador = buscarServicio(myAgent, "ensamblador-plan");
-                if (ensamblador != null) {
-                    System.out.println("[Coordinador] Informando al ensamblador que se esperan " + examenes.size() + " planes.");
-                    ACLMessage msgTotal = new ACLMessage(ACLMessage.INFORM);
-                    msgTotal.addReceiver(ensamblador);
-                    msgTotal.setContent("totalExamenes=" + examenes.size());
-                    myAgent.send(msgTotal);
-                } else {
-                    System.err.println("[Coordinador] No se pudo encontrar al AgenteEnsamblador para enviarle el total.");
-                }
-
-
                 int totalExamenes = examenes.size();
 
                 //comportamiento paralelo

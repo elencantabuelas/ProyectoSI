@@ -42,7 +42,6 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
                 //Mensaje del Coordinador con el total de planes a esperar
                 try {
                     totalPlanesEsperados = Integer.parseInt(contenido.split("=")[1]);
-                    planesCompletados.clear();//Reseteamos por si acaso
                     System.out.println("[Ensamblador] Se esperan " + totalPlanesEsperados + " planes en total.");
                 } catch (Exception e) {
                     System.err.println("[Ensamblador] Error al leer el total de exámenes.");

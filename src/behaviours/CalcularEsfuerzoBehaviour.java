@@ -66,8 +66,15 @@ public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
                         + " → horas recomendadas=" + horas);
 
                 AID ensamblador = buscarServicio(myAgent, SERVICIO_ENSAMBLADOR);
-
                 if (ensamblador != null) {
+
+// --- ENVIO NUMERO DE EXAMENES EN UN MENSAJE DISTINTO ---
+                    ACLMessage msgTotal = new ACLMessage(ACLMessage.INFORM);
+                    msgTotal.addReceiver(ensamblador);
+                    msgTotal.setContent("totalExamenes=" + totalExamenes);
+                    myAgent.send(msgTotal);
+// -------------------------------------------------------
+
                     ACLMessage msgEnsamblador = new ACLMessage(ACLMessage.INFORM);
                     msgEnsamblador.addReceiver(ensamblador);
                     msgEnsamblador.setContent("asignatura=" + asignatura + ";horas=" + horas);
