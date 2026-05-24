@@ -40,17 +40,62 @@ public class EnviarExamenBehaviour extends OneShotBehaviour
     @Override
     public void action()
     {
-        int totalExamenes = Integer.parseInt(pedirDato("Cuantos examenes quieres introducir:"));
+        Integer totalExamenes = pedirTotalExamenes();
+
+        if (totalExamenes == null)
+        {
+            return;
+        }
 
         List<Examen> examenes = new ArrayList<>();
 
         for (int i = 1; i <= totalExamenes; i++)
         {
             Examen examen = pedirDatosExamen(i);
+
+            if (examen == null)
+            {
+                return;
+            }
+
             examenes.add(examen);
         }
 
         enviarExamenes(examenes);
+    }
+
+    private Integer pedirTotalExamenes()
+    {
+        while (true)
+        {
+            String valor = pedirDato("Cuantos examenes quieres introducir:");
+
+            if (valor == null)
+            {
+                System.out.println("Entrada cancelada por el usuario.");
+                return null;
+            }
+
+            try
+            {
+                int totalExamenes = Integer.parseInt(valor.trim());
+
+                if (totalExamenes <= 0)
+                {
+                    throw new IllegalArgumentException("El numero de examenes debe ser mayor que 0.");
+                }
+
+                return totalExamenes;
+            }
+            catch (NumberFormatException e)
+            {
+                System.out.println("Numero de examenes no valido: introduce un numero entero.");
+            }
+            catch (IllegalArgumentException e)
+            {
+                System.out.println("Numero de examenes no valido: " + e.getMessage());
+            }
+        }
     }
 
     private Examen pedirDatosExamen(int numeroExamen)
@@ -69,42 +114,98 @@ public class EnviarExamenBehaviour extends OneShotBehaviour
 
         agregarCampo(panel, gbc, 0, "Asignatura:", campoAsignatura);
         agregarCampo(panel, gbc, 1, "Creditos:", campoCreditos);
-        agregarCampo(panel, gbc, 2, "Porcentaje del examen:", campoPorcentaje);
+        agregarCampo(panel, gbc, 2, "Porcentaje del examen (1-100):", campoPorcentaje);
         agregarCampo(panel, gbc, 3, "Dificultad (1-10):", campoDificultad);
         agregarCampo(panel, gbc, 4, "Dias antes del examen:", campoDias);
         agregarCampo(panel, gbc, 5, "Nota deseada:", campoNotaDeseada);
 
-        int opcion = JOptionPane.showConfirmDialog(
-                null,
-                panel,
-                "Datos del examen " + numeroExamen,
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-        );
-
-        if (opcion != JOptionPane.OK_OPTION)
+        while (true)
         {
-            throw new IllegalArgumentException("Entrada cancelada por el usuario.");
+            int opcion = JOptionPane.showConfirmDialog(
+                    null,
+                    panel,
+                    "Datos del examen " + numeroExamen,
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (opcion != JOptionPane.OK_OPTION)
+            {
+                System.out.println("Entrada cancelada por el usuario.");
+                return null;
+            }
+
+            try
+            {
+                String asignatura = campoAsignatura.getText().trim();
+
+                if (asignatura.isEmpty())
+                {
+                    throw new IllegalArgumentException("La asignatura no puede estar vacia.");
+                }
+
+                double creditos = leerDouble(campoCreditos, "creditos");
+                double porcentajeExamen = leerDouble(campoPorcentaje, "porcentaje del examen");
+                int dificultad = leerEntero(campoDificultad, "dificultad");
+                int dias = leerEntero(campoDias, "dias antes del examen");
+                double notaDeseada = leerDouble(campoNotaDeseada, "nota deseada");
+
+                validarRango(creditos, "creditos", 0, Double.MAX_VALUE);
+                validarRango(porcentajeExamen, "porcentaje del examen", 1, 100);
+                validarRango(dificultad, "dificultad", 1, 10);
+                validarRango(dias, "dias antes del examen", 0, Integer.MAX_VALUE);
+                validarRango(notaDeseada, "nota deseada", 0, 10);
+
+                Examen examen = new Examen();
+                examen.setAsignatura(asignatura);
+                examen.setCreditos(creditos * porcentajeExamen / 100);
+                examen.setDificultad(dificultad);
+                examen.setDiasAntesExamen(dias);
+                examen.setNotaDeseada(notaDeseada);
+
+                return examen;
+            }
+            catch (NumberFormatException e)
+            {
+                System.out.println("Datos no validos del examen " + numeroExamen + ": " + e.getMessage());
+            }
+            catch (IllegalArgumentException e)
+            {
+                System.out.println("Datos no validos del examen " + numeroExamen + ": " + e.getMessage());
+            }
         }
+    }
 
-        String asignatura = campoAsignatura.getText().trim();
-
-        if (asignatura.isEmpty())
+    private double leerDouble(JTextField campo, String nombreCampo)
+    {
+        try
         {
-            throw new IllegalArgumentException("La asignatura no puede estar vacia.");
+            return Double.parseDouble(campo.getText().trim());
         }
+        catch (NumberFormatException e)
+        {
+            throw new NumberFormatException("El campo " + nombreCampo + " debe ser numerico.");
+        }
+    }
 
-        double creditos = Double.parseDouble(campoCreditos.getText());
-        double porcentajeExamen = Double.parseDouble(campoPorcentaje.getText());
+    private int leerEntero(JTextField campo, String nombreCampo)
+    {
+        try
+        {
+            return Integer.parseInt(campo.getText().trim());
+        }
+        catch (NumberFormatException e)
+        {
+            throw new NumberFormatException("El campo " + nombreCampo + " debe ser un numero entero.");
+        }
+    }
 
-        Examen examen = new Examen();
-        examen.setAsignatura(asignatura);
-        examen.setCreditos(creditos * porcentajeExamen / 100);
-        examen.setDificultad(Integer.parseInt(campoDificultad.getText()));
-        examen.setDiasAntesExamen(Integer.parseInt(campoDias.getText()));
-        examen.setNotaDeseada(Double.parseDouble(campoNotaDeseada.getText()));
-
-        return examen;
+    private void validarRango(double valor, String nombreCampo, double minimo, double maximo)
+    {
+        if (valor < minimo || valor > maximo)
+        {
+            throw new IllegalArgumentException("El campo " + nombreCampo + " debe estar entre " + minimo + " y " + maximo + ".");
+        }
     }
 
     private void agregarCampo(JPanel panel, GridBagConstraints gbc, int fila, String etiqueta, JTextField campo)
@@ -121,14 +222,7 @@ public class EnviarExamenBehaviour extends OneShotBehaviour
 
     private String pedirDato(String mensaje)
     {
-        String valor = JOptionPane.showInputDialog(null, mensaje, "Datos del examen", JOptionPane.QUESTION_MESSAGE);
-
-        if (valor == null)
-        {
-            throw new IllegalArgumentException("Entrada cancelada por el usuario.");
-        }
-
-        return valor;
+        return JOptionPane.showInputDialog(null, mensaje, "Datos del examen", JOptionPane.QUESTION_MESSAGE);
     }
 
     private void enviarExamenes(List<Examen> examenes)
