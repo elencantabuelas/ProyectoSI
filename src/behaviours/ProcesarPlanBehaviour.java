@@ -93,7 +93,7 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
 
             StringBuilder planBuilder = new StringBuilder();
             planBuilder.append("Asignatura: ").append(asignatura).append("\n");
-            planBuilder.append("  - Horas recomendadas: ").append(horasNum).append("\n");
+            planBuilder.append("  - Horas recomendadas: ").append(horasNum).append(" horas para ").append(diasNum).append(" días restantes. ").append("\n");
             planBuilder.append("  - Prioridad: ").append(prioridad).append("\n");
 
             // Aplicamos la lógica de validación
