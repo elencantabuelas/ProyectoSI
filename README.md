@@ -51,16 +51,19 @@ o puedes usar github desktop
 
 # 3. Instrucciones de Ejecución
 
-Para arrancar la plataforma JADE y lanzar nuestros agentes:
+Para ejecutar el sistema planificador de estudios, sigue estos sencillos pasos:
 
-1. Configurar el **Main Class** en el IDE como: `jade.Boot`
-2. En los **Program Arguments**, introducir:
+1.  **Abre el Proyecto:** Abre el proyecto en tu entorno de desarrollo (por ejemplo, IntelliJ IDEA).
 
-    ```
-    -gui 
-    ```
+2.  **Localiza el Punto de Entrada:** Navega hasta el archivo `Main.java` que se encuentra en el directorio `src`.
 
-3. Ejecutar el proyecto. Debería abrirse la interfaz RMA (Remote Agent Management) mostrando el _Main-Container_ con nuestros agentes registrados.
+3.  **Ejecuta el `main`:** Haz clic derecho sobre el archivo `Main.java` y selecciona la opción **"Run 'Main.main()'"**.
+
+4.  **Inicio de la Aplicación:** Al ejecutar el `main`, ocurrirán dos cosas:
+   *   Se abrirá la **consola de JADE (RMA)**, donde podrás ver a todos los agentes del sistema (`coordinador`, `interfaz`, `esfuerzo`, etc.) en estado activo.
+   *   Aparecerá la **primera ventana emergente** de la aplicación, preguntándote cuántos exámenes deseas introducir.
+
+
 
 # 4. Datos de Ejemplo
 
