@@ -110,7 +110,7 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
             diasRestantesRecibidos.remove(conversationId);
             notasDeseadasRecibidas.remove(conversationId);
 
-            if (totalPlanesEsperados > 0 && planesCompletados.size() >= totalPlanesEsperados) {
+            if (totalPlanesEsperados > 0 && planesCompletados.size() == totalPlanesEsperados) {
                 mostrarResultadosFinales();
             }
         }
