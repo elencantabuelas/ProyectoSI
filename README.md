@@ -98,6 +98,7 @@ Nota deseada: 7
 
 
 ```mermaid
+
 ---
 config:
   layout: elk
@@ -107,8 +108,8 @@ flowchart TB
     A["`**Agente Interfaz**`"] -- Lista Examenes --> B["`**Agente Coordinador**`"]
     B -- n°examenes<br>asignatura<br>nota deseada<br>creditos<br>dificultad --> C["`**Agente Esfuerzo**`"]
     B -- n°examenes<br>asignatura<br>nota deseada<br>dias antes del examen --> D["`**Agente Urgencia**`"]
-    C -- {asignatura, horas} --> E["Agente Ensamblador"]
-    D -- {numero de examnes}  {asignatura, prioridad} --> E
+    C -- {numero de examenes} {asignatura, horas} --> E["Agente Ensamblador"]
+    D -- {asignatura, prioridad,dias restantes, nota deseada} --> E
 
      A:::interfaz
      B:::coordinador
@@ -125,6 +126,9 @@ flowchart TB
     style C stroke:#ffffff,fill:#000000,font-size:14px,color:#ffffff
     style D fill:#000000,stroke:#ffffff,color:#ffffff
     style E stroke:#ffffff,color:#ffffff,fill:#000000
+
 `````
 # 6. Declaración de IA
+
+Durante el desarrollo del proyecto hemos utilizado herramientas de IA generativa como apoyo en la comprensión de conceptos, resolución de dudas puntuales y revisión de código. En todo momento el diseño de la arquitectura, las decisiones técnicas y la implementación final han sido responsabilidad del equipo.
 
