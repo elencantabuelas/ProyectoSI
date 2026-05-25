@@ -29,7 +29,6 @@ public class CalcularUrgenciaBehaviour extends CyclicBehaviour {
 
         if (mensaje != null) {
             String contenido = mensaje.getContent();
-            System.out.println("AgenteUrgencia recibio petición de " + mensaje.getSender().getLocalName() + " -> " + contenido);
 
             try {
                 String[] partes = contenido.split(",");
@@ -41,7 +40,7 @@ public class CalcularUrgenciaBehaviour extends CyclicBehaviour {
 
                 // Nos aseguramos de haber recibido todos los exámenes de la planificación
                 if (examenesRecibidos.size() == examenesEsperados) {
-                    System.out.println("AgenteUrgencia: Todos los exámenes recibidos (" + examenesEsperados + "). Procesando solapamientos temporales...");
+
 
                     for (int i = 0; i < examenesRecibidos.size(); i++) {
                         String[] p = examenesRecibidos.get(i);
@@ -74,7 +73,7 @@ public class CalcularUrgenciaBehaviour extends CyclicBehaviour {
                         double indiceEstres = estresBase * factorExigencia * cargaSolapada;
 
                         String prioridad = calcularPrioridad(indiceEstres);
-                        System.out.printf("AgenteUrgencia calculo -> Asignatura: %s | Carga Solapada: %.2f | Índice Estrés: %.2f | Prioridad: %s\n", asignatura, cargaSolapada, indiceEstres, prioridad);
+
 
                         // Enviar cada mensaje individualmente al ensamblador
                         AID agenteEnsamblador = buscarServicio(myAgent, "ensamblador-plan");

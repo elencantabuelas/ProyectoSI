@@ -58,22 +58,14 @@ public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
 
                 int horas = calcularHoras(creditos, dificultad, notaDeseada);
 
-                System.out.println("Asignatura:" + asignatura
-                        + " creditos=" + creditos
-                        + " dificultad=" + dificultad
-                        + " notaDeseada=" + notaDeseada
-                        + " totalExamenes=" + totalExamenes
-                        + " → horas recomendadas=" + horas);
-
                 AID ensamblador = buscarServicio(myAgent, SERVICIO_ENSAMBLADOR);
                 if (ensamblador != null) {
 
-// --- ENVIO NUMERO DE EXAMENES EN UN MENSAJE DISTINTO ---
+                    //envio aparte del total de examenes
                     ACLMessage msgTotal = new ACLMessage(ACLMessage.INFORM);
                     msgTotal.addReceiver(ensamblador);
                     msgTotal.setContent("totalExamenes=" + totalExamenes);
                     myAgent.send(msgTotal);
-// -------------------------------------------------------
 
                     ACLMessage msgEnsamblador = new ACLMessage(ACLMessage.INFORM);
                     msgEnsamblador.addReceiver(ensamblador);
@@ -81,7 +73,6 @@ public class CalcularEsfuerzoBehaviour extends CyclicBehaviour {
                     msgEnsamblador.setConversationId(convId);
                     myAgent.send(msgEnsamblador);
 
-                    System.out.println("convId=" + convId + ", horas=" + horas);
                 } else {
                     System.err.println("AgenteEsfuerzo: No se encontró el AgenteEnsamblador en el DF.");
                 }

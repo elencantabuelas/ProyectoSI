@@ -59,6 +59,7 @@ public class RecibirExamenBehaviour extends CyclicBehaviour {
 
                 int totalExamenes = examenes.size();
 
+
                 //comportamiento paralelo
                 ParallelBehaviour pb = new ParallelBehaviour(myAgent, ParallelBehaviour.WHEN_ALL);
                 pb.addSubBehaviour(new OneShotBehaviour() {
@@ -115,7 +116,7 @@ public class RecibirExamenBehaviour extends CyclicBehaviour {
                 myAgent.addBehaviour(pb);
 
             }catch (Exception e) {
-                System.out.println("coordinador no pudo obtener el mensaje: " + e.getMessage());
+                System.err.println("coordinador no pudo obtener el mensaje: " + e.getMessage());
                 e.printStackTrace();
 
             }
