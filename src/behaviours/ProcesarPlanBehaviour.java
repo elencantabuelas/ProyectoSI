@@ -4,7 +4,6 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.wrapper.StaleProxyException;
 
 import javax.swing.JOptionPane;
 import java.util.ArrayList;
@@ -116,12 +115,12 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
             notasDeseadasRecibidas.remove(conversationId);
 
             if (totalPlanesEsperados > 0 && planesCompletados.size() >= totalPlanesEsperados) {
-                mostrarResultadosFinalesYApagar();
+                mostrarResultadosFinales();
             }
         }
     }
 
-    private void mostrarResultadosFinalesYApagar() {
+    private void mostrarResultadosFinales() {
         StringBuilder sb = new StringBuilder("Se han generado todos los planes de estudio:\n\n");
         for (String plan : planesCompletados) {
             sb.append(plan).append("\n");
@@ -136,13 +135,6 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
 
         planesCompletados.clear();
         totalPlanesEsperados = 0;
-
-        try {
-            System.out.println("[Ensamblador] Todo el trabajo completado. Apagando la plataforma...");
-            myAgent.getContainerController().kill();
-            System.exit(0);
-        } catch (StaleProxyException e) {
-            System.err.println("[Ensamblador] Error al intentar apagar el contenedor: " + e.getMessage());
-        }
+        System.out.println("[Ensamblador] Todo el trabajo completado.");
     }
 }
