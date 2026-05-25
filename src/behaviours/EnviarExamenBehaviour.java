@@ -107,7 +107,6 @@ public class EnviarExamenBehaviour extends OneShotBehaviour
 
             if (coordinador == null)
             {
-                System.out.println("No se pudo enviar la lista de examenes porque no se encontro el agente coordinador en el DF.");
                 return;
             }
 
@@ -125,11 +124,9 @@ public class EnviarExamenBehaviour extends OneShotBehaviour
             myAgent.getContentManager().fillContent(mensaje, new Action(coordinador, solicitud));
             myAgent.send(mensaje);
 
-            System.out.println("Lista de " + examenes.size() + " examenes enviada al agente coordinador mediante ontologia.");
         }
         catch (Exception e)
         {
-            System.out.println("Error al enviar los examenes: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -362,7 +359,6 @@ public class EnviarExamenBehaviour extends OneShotBehaviour
 
         private void cancelar()
         {
-            System.out.println("Entrada cancelada por el usuario.");
             ventana.dispose();
         }
     }

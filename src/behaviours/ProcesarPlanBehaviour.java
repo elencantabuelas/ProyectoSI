@@ -35,13 +35,10 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
 
         if (msg != null) {
             String contenido = msg.getContent();
-            System.out.println("[Ensamblador] Recibido INFORM de " + msg.getSender().getLocalName());
-            System.out.println("[Ensamblador] Contenido: " + contenido);
 
             if (contenido.startsWith("totalExamenes=")) {
                 try {
                     totalPlanesEsperados = Integer.parseInt(contenido.split("=")[1]);
-                    System.out.println("[Ensamblador] Se esperan " + totalPlanesEsperados + " planes en total.");
                 } catch (Exception e) {
                     System.err.println("[Ensamblador] Error al leer el total de exámenes.");
                 }
@@ -105,7 +102,6 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
             }
 
             planesCompletados.add(planBuilder.toString());
-            System.out.println("[Ensamblador] Plan para '" + asignatura + "' completado y añadido a la lista. (" + planesCompletados.size() + "/" + totalPlanesEsperados + ")");
 
             // Limpiar los mapas para este plan
             asignaturas.remove(conversationId);
@@ -135,6 +131,5 @@ public class ProcesarPlanBehaviour extends CyclicBehaviour {
 
         planesCompletados.clear();
         totalPlanesEsperados = 0;
-        System.out.println("[Ensamblador] Todo el trabajo completado.");
     }
 }
