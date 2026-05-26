@@ -1,8 +1,8 @@
 # Sistema planificador de estudios para exámenes
 
->[!NOTE]
+>[!IMPORTANT]
 >Presentacion del Proyecto:
->[Planificador de estudios](PresentacionSI.pdf) 
+>[PresentacionSI](PresentacionSI.pdf) 
 
 ## Descripción del Proyecto
 
