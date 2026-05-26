@@ -2,7 +2,7 @@
 
 >[!NOTE]
 >Presentacion del Proyecto:
->[Planificador de estudios](.PresentacionSI.pdf) 
+>[Planificador de estudios](PresentacionSI.pdf) 
 
 ## Descripción del Proyecto
 
