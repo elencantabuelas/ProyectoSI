@@ -1,6 +1,6 @@
 # Sistema planificador de estudios para exámenes
 
->[[NOTE]]
+>[!NOTE]
 >Presentacion del Proyecto:
 >[Planificador de estudios](.PresentacionSI.pdf) 
 
