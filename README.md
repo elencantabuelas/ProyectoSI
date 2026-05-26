@@ -1,5 +1,9 @@
 # Sistema planificador de estudios para exámenes
 
+>[[NOTE]]
+>Presentacion del Proyecto:
+>[Planificador de estudios](.PresentacionSI.pdf) 
+
 ## Descripción del Proyecto
 
 Este programa actúa como un asistente automatizado que genera planes de estudio personalizados para ayudar a un estudiante a organizar la preparación de sus exámenes.
